@@ -9,10 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selectedTab = "home"
+    // temp test data delete later
+    @State var accs = ["A1", "A2", "A3"]
+    @State var c = "NTD"
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            TransactionView()
+            TransactionView(Accounts: $accs, currency: $c)
                 .tabItem {
                     Image(systemName: "carrot")
                     Text("Feed")
