@@ -18,8 +18,10 @@ struct TransactionView: View {
     @State private var withdrawal: Bool = true
     
     var body: some View {
-        Text("New transaction")
-            .font(.headline)
+        VStack {
+            Text("New transaction")
+                .font(.headline)
+            
             Form{
                 Section(header: Text("Account").font(.headline)){
                     Picker("Select Account", selection: $selectedAccount) {
@@ -64,7 +66,7 @@ struct TransactionView: View {
             
         }
     }
-
+}
 
 #Preview {
     @Previewable @State var accs = ["A1", "A2", "A3"]
