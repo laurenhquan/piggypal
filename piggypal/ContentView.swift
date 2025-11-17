@@ -29,7 +29,7 @@ struct ContentView: View {
                 }
                 .tag("log")
             
-            HomeView()
+            HomeView(selectedTab: $selectedTab)
                 .tabItem {
                     Image(systemName: "house")
                     Text("Home")
