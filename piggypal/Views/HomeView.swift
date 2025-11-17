@@ -70,6 +70,7 @@ struct HomeView: View {
                     
                 HStack {
                     Text("<pie graph, showing how money was spent>")
+                        .padding()
                         
                     VStack {
                         Text("<status graph, showing how much of budget was used>")
@@ -79,13 +80,27 @@ struct HomeView: View {
                             .font(Font.footnote)
                             .foregroundColor(Color.red)
                     }
+                    .padding()
                 }
+                
+                Button("View Log") {
+                    selectedTab = "log"
+                }
+                .font(Font.title3.bold())
+                .foregroundColor(Color.black)
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(Color(red: 252/255, green: 236/255, blue: 120/255))
+                )
             }
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 15)
                     .fill(Color(red: 255/255, green: 201/255, blue: 212/255))
             )
+            
+            Spacer()
         }
         .padding()
     }
