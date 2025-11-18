@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @Binding var selectedTab: String
     @State private var showsAlert = false
+    @EnvironmentObject var controller: TransactionsController
     
     var body: some View {
         VStack {
