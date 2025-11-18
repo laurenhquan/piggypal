@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @Binding var selectedTab: String
+    @State private var showsAlert = false
     
     var body: some View {
         VStack {
@@ -43,25 +44,32 @@ struct HomeView: View {
                 } label: {
                     Image(systemName: "plus.forwardslash.minus")
                         .font(Font.title.bold())
-                        .foregroundColor(Color.black)
+                        .foregroundColor(Color("TextColor"))
                         .padding()
                         .background(
                             Circle()
-                                .fill(Color(red: 255/255, green: 158/255, blue: 177/255))
+                                .fill(Color("Button1Color"))
                         )
                 }
             }
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 15)
-                    .fill(Color(red: 255/255, green: 201/255, blue: 212/255))
+                    .fill(Color("CardColor"))
             )
                 
-//           Image("AppIcon")
-//              .scaledToFit()
-                
-            Text("<image of app icon (when clicked it takes you to transaction page?)>")
-                .padding()
+            Button {
+                showsAlert = true
+            } label: {
+                Image("AppLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .padding()
+            }
+            .alert("Oink! Oink!", isPresented: $showsAlert) {
+                Button("OK", role: .cancel) { }
+            }
+            
                 
             VStack {
                 Text("Spending Analysis")
@@ -87,17 +95,17 @@ struct HomeView: View {
                     selectedTab = "log"
                 }
                 .font(Font.title3.bold())
-                .foregroundColor(Color.black)
+                .foregroundColor(Color("TextColor"))
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 15)
-                        .fill(Color(red: 252/255, green: 236/255, blue: 120/255))
+                        .fill(Color("Button2Color"))
                 )
             }
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 15)
-                    .fill(Color(red: 255/255, green: 201/255, blue: 212/255))
+                    .fill(Color("CardColor"))
             )
             
             Spacer()
