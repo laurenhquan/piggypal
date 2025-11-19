@@ -146,13 +146,14 @@ struct TransactionView: View {
                 if withdrawal {
                     value = value * -1
                 }
-                //controller.feedPiggy(amount: value, currencyUsed: currencyCode, dateMade: selectedDate, category: transactionTitle, desc: transactionTitle)
+                controller.feedPiggy(amount: value, currencyUsed: currencyCode, dateMade: selectedDate, category: transactionTitle, desc: transactionTitle)
           //reset form
                 selectedDate = Date()
                 transactionTitle = ""
                 amount = nil
                 currencyCode = ""
                 withdrawal = true
+        //notification on submit "TBD"
             }
             .foregroundColor(.black)
             .padding()
@@ -169,7 +170,8 @@ struct TransactionView: View {
 
 #Preview {
     //@Previewable @State var accs = ["A1", "A2", "A3"]
-    @Previewable @EnvironmentObject var controller: TransactionsController
+    //@Previewable @EnvironmentObject var controller: TransactionsController
     @Previewable @State var c = "USD"
     TransactionView(defaultCode: $c)
+        .environmentObject(TransactionsController.shared)
 }

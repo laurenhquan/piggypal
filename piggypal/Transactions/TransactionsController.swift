@@ -13,7 +13,7 @@ class TransactionsController: ObservableObject {
     static let shared = TransactionsController()
     
     lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "piggypal")
+        let container = NSPersistentContainer(name: "TransactionsModel")
         
         container.loadPersistentStores { _, error in
             if let error {

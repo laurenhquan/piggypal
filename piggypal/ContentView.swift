@@ -17,6 +17,7 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             TransactionView(defaultCode: $c)
+                .environmentObject(TransactionsController.shared)
                 .tabItem {
                     Image(systemName: "carrot")
                     Text("Feed")
