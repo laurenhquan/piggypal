@@ -55,13 +55,14 @@ struct HomeView: View {
                     .fill(Color("CardColor"))
             )
             
-//          show if balance is less than -budget
             .onAppear {
-                showsWarningAlert = true
+                if controller.getBalance(from: controller.getAllTransactions()) < 0.0 { // show if balance is less than -budget
+                    showsWarningAlert = true
+                }
             }
             .alert("WARNING: You are over your spending budget!", isPresented: $showsWarningAlert) {
                 Button("Adjust Budget", role: .none) { selectedTab = "settings" }
-                Button("Ignore", role: .cancel) { }
+                Button("OK", role: .cancel) { }
             }
             
 //          PiggyPal Logo
@@ -115,7 +116,6 @@ struct HomeView: View {
         .padding()
     }
 }
-
 
 #Preview {
     HomeView(selectedTab: .constant("home"))

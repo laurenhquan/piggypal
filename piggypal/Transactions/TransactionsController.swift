@@ -74,16 +74,17 @@ class TransactionsController: ObservableObject {
         }
     }
     
-//    func getMonthlyTransactions(dateMade: Date) -> [Transaction] {
-//        let fetchRequest: NSFetchRequest<Transaction> = Transaction.fetchRequest()
-//        fetchRequest.predicate = NSPredicate(format: "", dateMade) check for month, year
-//        do {
-//            return try persistentContainer.viewContext.fetch(fetchRequest)
-//        } catch {
-//            print("Failed to fetch monthly transactions: \(error.localizedDescription)")
-//            return []
-//        }
-//    }
+    func getPeriodTransactions(startDate: Date, endDate: Date) -> [Transaction] {
+        let fetchRequest: NSFetchRequest<Transaction> = Transaction.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "dateMade >= %@ AND dateMade <= %@", startDate as NSDate, endDate as NSDate)
+                                              
+        do {
+            return try persistentContainer.viewContext.fetch(fetchRequest)
+        } catch {
+            print("Failed to fetch monthly transactions: \(error.localizedDescription)")
+            return []
+        }
+    }
     
     func feedPiggy(amount: Decimal, currencyUsed: String, dateMade: Date, category: String, desc: String) {
         let newTransaction = Transaction(context: persistentContainer.viewContext)
