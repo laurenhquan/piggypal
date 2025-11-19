@@ -6,71 +6,170 @@
 //
 
 import SwiftUI
-
+import Foundation
 
 struct TransactionView: View {
-    @Binding var Accounts: [String] //to get account data
-    @Binding var currency: String
+    @EnvironmentObject var controller: TransactionsController
     
-    @State private var selectedAccount: String = ""
+    //@Binding var Accounts: [String] //to get account data
+    @Binding var defaultCode: String
+    
+    @State private var selectedDate = Date()
+    //@State private var selectedAccount: String = ""
     @State private var transactionTitle: String = ""
-    @State private var amount: Double = 0.0
+    @State private var amount: Decimal?
+    @State private var currencyCode: String = ""
     @State private var withdrawal: Bool = true
+    @State private var codes: [String] = Locale.commonISOCurrencyCodes
+    
+    init(defaultCode: Binding<String>) {
+        self._defaultCode = defaultCode
+        
+        // If defaultCode exists in codes, use it; else fallback to first code
+        let code = codes.contains(defaultCode.wrappedValue) ? defaultCode.wrappedValue : codes.first ?? ""
+            _currencyCode = State(initialValue: code)
+        }
+
     
     var body: some View {
         VStack {
-            Text("New transaction")
-                .font(.headline)
-            
             Form{
-                Section(header: Text("Account").font(.headline)){
-                    Picker("Select Account", selection: $selectedAccount) {
-                        ForEach (Accounts, id: \.self) {acc in
-                            Text(acc)
-                                .tag(acc)
-                        }
-                    }
+//Title
+                HStack {
+                    Text("Feed")
+                    Image(systemName: "dollarsign")
+                        .padding(8)
+                        .background(
+                            Circle()
+                                .fill(Color("Button2Color"))
+                        )
+                        .overlay(
+                            Circle()
+                                .stroke(Color.black, lineWidth: 3) // black border
+                        )
                 }
+                .font(.largeTitle.bold())
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
                 
-                Section(header: Text("Transaction").font(.headline)){
-                    VStack(alignment: .leading, spacing: 4){
-                        TextField("Input transaction description", text: $transactionTitle)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                        
-                        Divider()
-                        
-                        Picker("Deposit or Withdrawal?", selection: $withdrawal) {
-                            Text("Withdrawal")
-                                .tag(true)
-                            Text("Deposit")
-                                .tag(false)
-                        }
-                    }
+//Date
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Date")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    DatePicker(
+                            "Enter Date",
+                            selection: $selectedDate,
+                            displayedComponents: .date
+                        )
+                        .datePickerStyle(.compact)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color("Button1Color"))
+                        )
                 }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(Color("CardColor"))
+                )
                 
-                Section(header: Text("Amount").font(.headline)){
-                    VStack(alignment: .leading, spacing: 4){
-                        TextField("Input transaction amount $$$", value: $amount, format: .currency(code: currency))
+//Amount
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Amount")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack {
+                        TextField("Enter amount in \(currencyCode)", value: $amount, format: .currency(code: currencyCode))
                             .keyboardType(.decimalPad)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .textFieldStyle(PlainTextFieldStyle())
+                        Picker("", selection: $currencyCode) {
+                            ForEach (codes, id: \.self) {c in
+                                Text(c)
+                                    .tag(c)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color("Button1Color"))
+                        
+                    )
+                    
+                    Divider()
+                    
+                    Picker("Deposit or Withdrawal?", selection: $withdrawal) {
+                        Text("Withdrawal")
+                            .tag(true)
+                        Text("Deposit")
+                            .tag(false)
                     }
                 }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(Color("CardColor"))
+                )
+                
+//Description
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Description")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    TextField("Enter description", text: $transactionTitle)
+                        .padding()
+                        .textFieldStyle(PlainTextFieldStyle())
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color("Button1Color"))
+                                        
+                        )
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(Color("CardColor"))
+                )
+                
+//Category
             }
+            .scrollContentBackground(.hidden)
+            .background(Color.white)
             
-            Spacer()
             
             Button("Submit", systemImage: "plus"){
                 //send transaction info to database
-                //close page
+                var value: Decimal = amount ?? 0.0
+                if withdrawal {
+                    value = value * -1
+                }
+                //controller.feedPiggy(amount: value, currencyUsed: currencyCode, dateMade: selectedDate, category: transactionTitle, desc: transactionTitle)
+          //reset form
+                selectedDate = Date()
+                transactionTitle = ""
+                amount = nil
+                currencyCode = ""
+                withdrawal = true
             }
-            .padding(.bottom, 20)
+            .foregroundColor(.black)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color("Button2Color"))
+                )
+            
+            Spacer()
         }
         .background(.white)
     }
 }
 
 #Preview {
-    @Previewable @State var accs = ["A1", "A2", "A3"]
-    @Previewable @State var c = "NTD"
-    TransactionView(Accounts: $accs, currency: $c)
+    //@Previewable @State var accs = ["A1", "A2", "A3"]
+    @Previewable @EnvironmentObject var controller: TransactionsController
+    @Previewable @State var c = "USD"
+    TransactionView(defaultCode: $c)
 }
