@@ -9,16 +9,19 @@ import SwiftUI
 
 struct HomeView: View {
     @Binding var selectedTab: String
-    @State private var showsAlert = false
+    @State private var showsOinkAlert = false
+    @State private var showsWarningAlert = false
     @EnvironmentObject var controller: TransactionsController
     
     var body: some View {
         VStack {
+//          Title
             Text("Home")
                 .font(Font.largeTitle.bold())
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
             
+//          Balance Card
             HStack {
                 VStack {
                     Text("Balance")
@@ -31,7 +34,6 @@ struct HomeView: View {
                     
                     Text("As of \(Date().formatted(.dateTime.month(.wide).day().year()))")
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        
                 }
                     
                 Button {
@@ -52,20 +54,30 @@ struct HomeView: View {
                 RoundedRectangle(cornerRadius: 15)
                     .fill(Color("CardColor"))
             )
-                
+            
+//          show if balance is less than -budget
+            .onAppear {
+                showsWarningAlert = true
+            }
+            .alert("WARNING: You are over your spending budget!", isPresented: $showsWarningAlert) {
+                Button("Adjust Budget", role: .none) { selectedTab = "settings" }
+                Button("Ignore", role: .cancel) { }
+            }
+            
+//          PiggyPal Logo
             Button {
-                showsAlert = true
+                showsOinkAlert = true
             } label: {
                 Image("AppLogo")
                     .resizable()
                     .scaledToFit()
                     .padding()
             }
-            .alert("Oink! Oink!", isPresented: $showsAlert) {
+            .alert("Oink! Oink!", isPresented: $showsOinkAlert) {
                 Button("OK", role: .cancel) { }
             }
             
-                
+//          Spending Analysis Card
             VStack {
                 Text("Spending Analysis")
                     .font(Font.title2.bold())
@@ -76,12 +88,7 @@ struct HomeView: View {
                         .padding()
                         
                     VStack {
-                        Text("<status graph, showing how much of budget was used>")
-                        Text("if over budget, show warning")
-                            .font(Font.footnote)
-                        Text("Warning: You're over your set budget by $X!")
-                            .font(Font.footnote)
-                            .foregroundColor(Color.red)
+                        Text("category color coding?")
                     }
                     .padding()
                 }
