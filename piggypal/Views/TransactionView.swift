@@ -63,8 +63,9 @@ struct TransactionView: View {
                 //send transaction info to database
                 //close page
             }
-            
+            .padding(.bottom, 20)
         }
+        .background(.white)
     }
 }
 
