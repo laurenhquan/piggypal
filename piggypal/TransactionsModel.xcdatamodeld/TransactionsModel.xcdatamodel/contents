@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24411" systemVersion="24G90" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="Transaction" representedClassName=".Transaction" syncable="YES" codeGenerationType="class">
-        <attribute name="amount" optional="YES" attributeType="Decimal" defaultValueString="0.0"/>
-        <attribute name="category" optional="YES" attributeType="String"/>
-        <attribute name="currencyUsed" optional="YES" attributeType="String"/>
-        <attribute name="dateMade" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="amount" attributeType="Decimal" defaultValueString="0.0"/>
+        <attribute name="category" attributeType="String"/>
+        <attribute name="currencyUsed" attributeType="String"/>
+        <attribute name="dateMade" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="desc" optional="YES" attributeType="String"/>
     </entity>
 </model>
