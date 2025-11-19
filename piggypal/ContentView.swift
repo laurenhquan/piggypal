@@ -32,6 +32,7 @@ struct ContentView: View {
                 .tag("log")
             
             HomeView(selectedTab: $selectedTab)
+                .environmentObject(TransactionsController.shared)
                 .tabItem {
                     Image(systemName: "house")
                     Text("Home")

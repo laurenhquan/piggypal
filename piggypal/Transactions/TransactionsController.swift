@@ -12,6 +12,8 @@ import Combine
 class TransactionsController: ObservableObject {
     static let shared = TransactionsController()
     
+    @Published var transactions: [Transaction] = []
+    
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "TransactionsModel")
         
@@ -23,7 +25,7 @@ class TransactionsController: ObservableObject {
         return container
     }()
     
-    private init() { }
+    private init() { updateDB() }
     
     func save() {
         guard persistentContainer.viewContext.hasChanges else { return }
@@ -35,24 +37,42 @@ class TransactionsController: ObservableObject {
         }
     }
     
+    func updateDB() {
+        let request: NSFetchRequest<Transaction> = Transaction.fetchRequest()
+        
+        do {
+            transactions = try persistentContainer.viewContext.fetch(request)
+        } catch {
+            print("Failed to fetch transactions: \(error.localizedDescription)")
+        }
+    }
+    
     func getAllTransactions() -> [Transaction] {
         let fetchRequest: NSFetchRequest<Transaction> = Transaction.fetchRequest()
         
         do {
             return try persistentContainer.viewContext.fetch(fetchRequest)
         } catch {
-            print("Failed to fetch transactions: \(error.localizedDescription)")
+            print("Failed to return transactions: \(error.localizedDescription)")
             return []
         }
     }
     
-//    func getBalance() {
-//        ...
-//    }
+    func getBalance(from transactions: [Transaction]) -> Decimal {
+        return transactions.reduce(0) { $0 + ($1.amount?.decimalValue ?? 0) }
+    }
     
-//    func getCategoryTransactions() {
-//        ...
-//    }
+    func getCategoryTransactions(category: String) -> [Transaction] {
+        let fetchRequest: NSFetchRequest<Transaction> = Transaction.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "category == %@", category)
+        
+        do {
+            return try persistentContainer.viewContext.fetch(fetchRequest)
+        } catch {
+            print("Failed to fetch category transactions: \(error.localizedDescription)")
+            return []
+        }
+    }
     
     func feedPiggy(amount: Decimal, currencyUsed: String, dateMade: Date, category: String, desc: String) {
         let newTransaction = Transaction(context: persistentContainer.viewContext)
@@ -64,11 +84,13 @@ class TransactionsController: ObservableObject {
         newTransaction.desc = desc
         
         save()
+        updateDB()
     }
     
     func deleteTransaction(transaction: Transaction) {
         persistentContainer.viewContext.delete(transaction)
         save()
+        updateDB()
     }
     
     func editTransaction(transaction: Transaction, newAmount: Decimal, newCurrencyUsed: String, newDateMade: Date, newCategory: String, newDesc: String) {
@@ -79,6 +101,7 @@ class TransactionsController: ObservableObject {
         transaction.desc = newDesc
         
         save()
+        updateDB()
     }
     
     func clearAllTransactions() {
@@ -91,5 +114,7 @@ class TransactionsController: ObservableObject {
         } catch {
             print("Failed to clear all transactions: \(error.localizedDescription)")
         }
+        
+        updateDB()
     }
 }
