@@ -14,9 +14,11 @@ struct piggypalApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, transactionsController.persistentContainer.viewContext)
-                .environmentObject(transactionsController)
+            NavigationStack {
+                ContentView()
+            }
+            .environment(\.managedObjectContext, transactionsController.persistentContainer.viewContext)
+            .environmentObject(transactionsController)
         }
     }
 }

@@ -9,15 +9,15 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selectedTab = "home"
-//    @Environment(\.managedObjectContext) private var viewContext
-    // temp test data delete later
-    //@State var accs = ["A1", "A2", "A3"]
     @State var c = "NTD"
-    
+
+    @EnvironmentObject var settings: AppSettings
+    @EnvironmentObject var transactionsController: TransactionsController
+
     var body: some View {
         TabView(selection: $selectedTab) {
+            
             TransactionView(defaultCode: $c)
-                .environmentObject(TransactionsController.shared)
                 .tabItem {
                     Image(systemName: "carrot")
                     Text("Feed")
@@ -32,7 +32,6 @@ struct ContentView: View {
                 .tag("log")
             
             HomeView(selectedTab: $selectedTab)
-                .environmentObject(TransactionsController.shared)
                 .tabItem {
                     Image(systemName: "house")
                     Text("Home")
@@ -53,9 +52,14 @@ struct ContentView: View {
                 }
                 .tag("settings")
         }
+        // ← Attach environment objects here at the TabView level
+        .environmentObject(settings)
+        .environmentObject(transactionsController)
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(AppSettings())
+        .environmentObject(TransactionsController.shared)
 }
