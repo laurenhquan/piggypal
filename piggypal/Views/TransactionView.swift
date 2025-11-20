@@ -86,9 +86,10 @@ struct TransactionView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     HStack {
-                        TextField("Enter amount in \(currencyCode)", value: $amount, format: .currency(code: currencyCode))
+                        TextField("Enter amount in ...", value: $amount, format: .currency(code: currencyCode))
                             .keyboardType(.decimalPad)
                             .textFieldStyle(PlainTextFieldStyle())
+                            .id(currencyCode)
                         Picker("", selection: $currencyCode) {
                             ForEach (codes, id: \.self) {c in
                                 Text(c)
@@ -172,6 +173,7 @@ struct TransactionView: View {
                     currencyCode = defaultCode
                     withdrawal = true
                 }
+                .bold()
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 10)
@@ -198,6 +200,7 @@ struct TransactionView: View {
                         isValid = true
                     }
                 }
+                .bold()
                 .foregroundColor(.black)
                 .padding()
                 .background(

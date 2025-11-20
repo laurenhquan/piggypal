@@ -9,10 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selectedTab = "home"
-//    @Environment(\.managedObjectContext) private var viewContext
-    // temp test data delete later
-    //@State var accs = ["A1", "A2", "A3"]
-    @State var c = "NTD"
+    @State var c = "USD"
     
     var body: some View {
         TabView(selection: $selectedTab) {
