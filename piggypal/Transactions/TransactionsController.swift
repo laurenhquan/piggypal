@@ -58,30 +58,6 @@ class TransactionsController: ObservableObject {
         }
     }
     
-    func getWithdrawals(from transactions: [Transaction]) -> [Transaction] {
-        let fetchRequest: NSFetchRequest<Transaction> = Transaction.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "amount < 0.0")
-        
-        do {
-            return try persistentContainer.viewContext.fetch(fetchRequest)
-        } catch {
-            print("Failed to return withdrawals: \(error.localizedDescription)")
-            return []
-        }
-    }
-    
-    func getDeposits(from transactions: [Transaction]) -> [Transaction] {
-        let fetchRequest: NSFetchRequest<Transaction> = Transaction.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "amount > 0.0")
-        
-        do {
-            return try persistentContainer.viewContext.fetch(fetchRequest)
-        } catch {
-            print("Failed to return deposits: \(error.localizedDescription)")
-            return []
-        }
-    }
-    
     func getBalance(from transactions: [Transaction]) -> Decimal {
         return transactions.reduce(0) { $0 + ($1.amount?.decimalValue ?? 0)}
     }
