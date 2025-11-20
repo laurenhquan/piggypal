@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Charts
 
 struct HomeView: View {
     @Binding var selectedTab: String
@@ -42,7 +43,9 @@ struct HomeView: View {
                         .foregroundColor(Color("TextColor"))
                         .frame(maxWidth: .infinity, alignment: .leading)
                             
-                    Text(controller.getBalance(from: controller.getAllTransactions()), format: .currency(code: "USD")) // change to update based on transaction database
+                    let startDate = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date()))!
+                    let endDate = Calendar.current.date(byAdding: DateComponents(month: 1, day: -1), to: startDate)!
+                    Text(controller.getBalance(from: controller.getPeriodTransactions(startDate: startDate, endDate: endDate)), format: .currency(code: "USD")) // change to update based on transaction database
                         .font(Font.largeTitle.bold())
                         .foregroundColor(Color("TextColor"))
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -108,8 +111,21 @@ struct HomeView: View {
                     .font(Font.title2.bold())
                     .frame(maxWidth: .infinity, alignment: .leading)
                     
-                Text("<pie graph, showing how money was spent>")
-                    .padding()
+//                let startDate = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date()))!
+//                let endDate = Calendar.current.date(byAdding: DateComponents(month: 1, day: -1), to: startDate)!
+//                let data = [
+//                    (category: "Home & Utilities", spent: controller.getBalance(from: controller.getCategoryTransactions(category: "Home & Utilities", startDate: startDate, endDate: endDate))),
+//                    (category: "Transportation", spent: controller.getBalance(from: controller.getCategoryTransactions(category: "Transportation", startDate: startDate, endDate: endDate))),
+//                    (category: "Groceries", spent: controller.getBalance(from: controller.getCategoryTransactions(category: "Groceries", startDate: startDate, endDate: endDate))),
+//                    (category: "Health", spent: controller.getBalance(from: controller.getCategoryTransactions(category: "Health", startDate: startDate, endDate: endDate))),
+//                    (category: "Restaurant & Dining", spent: controller.getBalance(from: controller.getCategoryTransactions(category: "Restaurant & Dining", startDate: startDate, endDate: endDate))),
+//                    (category: "Shopping & Entertainment", spent: controller.getBalance(from: controller.getCategoryTransactions(category: "Shopping & Entertainment", startDate: startDate, endDate: endDate)))
+//                ]
+//                Chart(data, id: \.category) { item in
+//                    SectorMark(angle: .value("Amount Spent", abs(item.spent)))
+//                        .foregroundStyle(by: .value("Category", item.category))
+//                }
+//                    .padding()
                 
                 Text("category color coding? and actual numbers")
                     .padding()
