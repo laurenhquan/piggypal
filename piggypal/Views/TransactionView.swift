@@ -21,6 +21,10 @@ struct TransactionView: View {
     @State private var currencyCode: String = ""
     @State private var withdrawal: Bool = true
     @State private var codes: [String] = Locale.commonISOCurrencyCodes
+    @State private var notValid: Bool = false
+    @State private var isValid: Bool = false
+    @State private var categories: [String] = ["Home & Utilities", "Transportation", "Groceries", "Health", "Restaurant & Dining", "Shopping & Entertainment"]
+    @State private var category: String = "Home & Utilities"
     
     init(defaultCode: Binding<String>) {
         self._defaultCode = defaultCode
@@ -28,13 +32,13 @@ struct TransactionView: View {
         // If defaultCode exists in codes, use it; else fallback to first code
         let code = codes.contains(defaultCode.wrappedValue) ? defaultCode.wrappedValue : codes.first ?? ""
             _currencyCode = State(initialValue: code)
-        }
+    }
 
     
     var body: some View {
         VStack {
             Form{
-//Title
+                //Title
                 HStack {
                     Text("Feed")
                     Image(systemName: "dollarsign")
@@ -52,23 +56,23 @@ struct TransactionView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
                 
-//Date
+                //Date
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Date")
                         .font(.headline)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
                     DatePicker(
-                            "Enter Date",
-                            selection: $selectedDate,
-                            displayedComponents: .date
-                        )
-                        .datePickerStyle(.compact)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color("Button1Color"))
-                        )
+                        "Enter Date",
+                        selection: $selectedDate,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.compact)
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color("Button1Color"))
+                    )
                 }
                 .padding()
                 .background(
@@ -76,7 +80,7 @@ struct TransactionView: View {
                         .fill(Color("CardColor"))
                 )
                 
-//Amount
+                //Amount
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Amount")
                         .font(.headline)
@@ -96,7 +100,6 @@ struct TransactionView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 10)
                             .fill(Color("Button1Color"))
-                        
                     )
                     
                     Divider()
@@ -114,7 +117,7 @@ struct TransactionView: View {
                         .fill(Color("CardColor"))
                 )
                 
-//Description
+                //Description
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Description")
                         .font(.headline)
@@ -125,7 +128,6 @@ struct TransactionView: View {
                         .background(
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(Color("Button1Color"))
-                                        
                         )
                 }
                 .padding()
@@ -134,33 +136,81 @@ struct TransactionView: View {
                         .fill(Color("CardColor"))
                 )
                 
-//Category
+                //Category
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Category")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Picker("Add to ...", selection: $category) {
+                        ForEach (categories, id: \.self) {c in
+                            Text(c)
+                                .tag(c)
+                        }
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color("Button1Color"))
+                    )
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(Color("CardColor"))
+                )
             }
             .scrollContentBackground(.hidden)
             .background(Color.white)
             
             
-            Button("Submit", systemImage: "plus"){
-                //send transaction info to database
-                var value: Decimal = amount ?? 0.0
-                if withdrawal {
-                    value = value * -1
+            HStack {
+                Button("Clear ", systemImage: "xmark") {
+                    //reset form
+                    selectedDate = Date()
+                    transactionTitle = ""
+                    amount = nil
+                    currencyCode = defaultCode
+                    withdrawal = true
                 }
-                controller.feedPiggy(amount: value, currencyUsed: currencyCode, dateMade: selectedDate, category: transactionTitle, desc: transactionTitle)
-          //reset form
-                selectedDate = Date()
-                transactionTitle = ""
-                amount = nil
-                currencyCode = ""
-                withdrawal = true
-        //notification on submit "TBD"
-            }
-            .foregroundColor(.black)
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color("Button2Color"))
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color("Button2Color"))
                 )
+                
+                Button("Submit", systemImage: "plus"){
+                    if amount == nil {
+                        notValid = true
+                    } else {
+                        //send transaction info to database
+                        var value: Decimal = amount ?? 0.0
+                        if withdrawal {
+                            value = value * -1
+                        }
+                        controller.feedPiggy(amount: value, currencyUsed: currencyCode, dateMade: selectedDate, category: transactionTitle, desc: transactionTitle)
+                        //reset form
+                        selectedDate = Date()
+                        transactionTitle = ""
+                        amount = nil
+                        currencyCode = defaultCode
+                        withdrawal = true
+                        //notification on submit ""
+                        isValid = true
+                    }
+                }
+                .foregroundColor(.black)
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color("Button2Color"))
+                )
+                .alert("Missing required field: Amount", isPresented: $notValid) {
+                    Button("OK", role: .cancel) {}
+                }
+                .alert("Done!", isPresented: $isValid) {
+                    Button("OK", role: .cancel) {}
+                }
+            }
             
             Spacer()
         }
