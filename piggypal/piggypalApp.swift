@@ -11,7 +11,8 @@ import CoreData
 @main
 struct piggypalApp: App {
     @StateObject private var transactionsController = TransactionsController.shared
-    
+    @StateObject private var settings = AppSettings()
+
     var body: some Scene {
         WindowGroup {
             NavigationStack {
@@ -19,6 +20,7 @@ struct piggypalApp: App {
             }
             .environment(\.managedObjectContext, transactionsController.persistentContainer.viewContext)
             .environmentObject(transactionsController)
+            .environmentObject(settings)
         }
     }
 }

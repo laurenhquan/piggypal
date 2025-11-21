@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selectedTab = "home"
-    @State var c = "NTD"
+    @State var c = "USD"   
 
     @EnvironmentObject var settings: AppSettings
     @EnvironmentObject var transactionsController: TransactionsController
@@ -52,7 +52,6 @@ struct ContentView: View {
                 }
                 .tag("settings")
         }
-        // ← Attach environment objects here at the TabView level
         .environmentObject(settings)
         .environmentObject(transactionsController)
     }
