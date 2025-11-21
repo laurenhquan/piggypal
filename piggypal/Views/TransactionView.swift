@@ -169,6 +169,7 @@ struct TransactionView: View {
                     //reset form
                     selectedDate = Date()
                     transactionTitle = ""
+                    category = ""
                     amount = nil
                     currencyCode = defaultCode
                     withdrawal = true
@@ -189,10 +190,11 @@ struct TransactionView: View {
                         if withdrawal {
                             value = value * -1
                         }
-                        controller.feedPiggy(amount: value, currencyUsed: currencyCode, dateMade: selectedDate, category: transactionTitle, desc: transactionTitle)
+                        controller.feedPiggy(amount: value, currencyUsed: currencyCode, dateMade: selectedDate, category: category, desc: transactionTitle)
                         //reset form
                         selectedDate = Date()
                         transactionTitle = ""
+                        category = ""
                         amount = nil
                         currencyCode = defaultCode
                         withdrawal = true
