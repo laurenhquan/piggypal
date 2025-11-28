@@ -143,10 +143,12 @@ struct HomeView: View {
                     
                     Chart(spendEarnData, id: \.type) { item in
                         BarMark(
-                            x: .value("Type", item.type),
-                            y: .value("Amount", item.amount)
+                            x: .value("Amount", item.amount)
                         )
+                        .foregroundStyle(by: .value("Type", item.type))
                     }
+                    .frame(height: 50, alignment: .center)
+                    .padding()
                     
                     // View Log Button
                     Button("View Log") {
