@@ -93,7 +93,8 @@ struct HomeView: View {
                         RoundedRectangle(cornerRadius: 30)
                             .fill(Color("NoteColor"))
                     )
-                    .padding(.top, -20)
+                    .padding(.top, -30)
+                    .padding([.leading, .trailing])
                 }
                 
                 // MARK: Spending Analysis Card

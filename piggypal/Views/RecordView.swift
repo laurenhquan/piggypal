@@ -64,13 +64,13 @@ struct RecordView: View {
                     }
                 }
                 .background(
-                    RoundedRectangle(cornerRadius: 15)
+                    RoundedRectangle(cornerRadius: 16)
                         .fill(Color("CardColor"))
                 )
+                .padding()
                 Spacer()
             }
             .navigationTitle("Transaction Log")
-            .padding()
         }
     }
 }

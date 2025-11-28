@@ -53,13 +53,13 @@ struct TransactionView: View {
                         .datePickerStyle(.compact)
                         .padding()
                         .background(
-                            RoundedRectangle(cornerRadius: 15)
+                            RoundedRectangle(cornerRadius: 14)
                                 .fill(Color("Button1Color"))
                         )
                     }
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 15)
+                        RoundedRectangle(cornerRadius: 16)
                             .fill(Color("CardColor"))
                     )
                     
@@ -82,7 +82,7 @@ struct TransactionView: View {
                         }
                         .padding()
                         .background(
-                            RoundedRectangle(cornerRadius: 10)
+                            RoundedRectangle(cornerRadius: 14)
                                 .fill(Color("Button1Color"))
                         )
                         
@@ -97,7 +97,7 @@ struct TransactionView: View {
                     }
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 15)
+                        RoundedRectangle(cornerRadius: 16)
                             .fill(Color("CardColor"))
                     )
                     
@@ -110,13 +110,13 @@ struct TransactionView: View {
                             .padding()
                             .textFieldStyle(PlainTextFieldStyle())
                             .background(
-                                RoundedRectangle(cornerRadius: 10)
+                                RoundedRectangle(cornerRadius: 14)
                                     .fill(Color("Button1Color"))
                             )
                     }
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 15)
+                        RoundedRectangle(cornerRadius: 16)
                             .fill(Color("CardColor"))
                     )
                     
@@ -133,13 +133,13 @@ struct TransactionView: View {
                         }
                         .padding()
                         .background(
-                            RoundedRectangle(cornerRadius: 15)
+                            RoundedRectangle(cornerRadius: 14)
                                 .fill(Color("Button1Color"))
                         )
                     }
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 15)
+                        RoundedRectangle(cornerRadius: 16)
                             .fill(Color("CardColor"))
                     )
                 }
@@ -162,7 +162,7 @@ struct TransactionView: View {
                     .foregroundColor(Color.red)
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 10)
+                        RoundedRectangle(cornerRadius: 14)
                             .fill(Color("Button2Color"))
                     )
                     
@@ -191,7 +191,7 @@ struct TransactionView: View {
                     .foregroundColor(.black)
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 10)
+                        RoundedRectangle(cornerRadius: 14)
                             .fill(Color("Button2Color"))
                     )
                     .alert("Missing required field: Amount", isPresented: $notValid) {

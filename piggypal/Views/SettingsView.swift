@@ -25,6 +25,7 @@ class AppSettings: ObservableObject {
 }
 
 struct SettingsView: View {
+    @EnvironmentObject var controller: TransactionsController
 
     @EnvironmentObject var settings: AppSettings
 
@@ -65,7 +66,7 @@ struct SettingsView: View {
                             .keyboardType(.decimalPad)
                             .padding()
                             .background(Color.white.opacity(0.8))
-                            .cornerRadius(12)
+                            .cornerRadius(14)
                     }
 
                     // MARK: - Budget Period
@@ -94,8 +95,8 @@ struct SettingsView: View {
                                 }
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .background(Color.white.opacity(0.8))
-                                .cornerRadius(16)
+                                .background(Color("BackgroundColor"))
+                                .cornerRadius(14)
                                 .shadow(color: .gray.opacity(0.15), radius: 4, x: 0, y: 2)
                             }
                         }
@@ -108,21 +109,18 @@ struct SettingsView: View {
                     } label: {
                         Text("Clear All Data")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color("TextColor"))
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color.hotPink)
-                            .cornerRadius(18)
+                            .background(Color("Button2Color"))
+                            .cornerRadius(14)
                             .shadow(color: Color.hotPink.opacity(0.4), radius: 5)
                     }
                     .padding(.top, 8)
                 }
                 .padding()
             }
-            .background(Color.lightPink.opacity(0.2))
             .navigationTitle("Settings")
-            .toolbarBackground(Color.darkPink, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
         }
     }
 
@@ -132,18 +130,19 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
                 .font(.headline)
-                .foregroundColor(.hotPink)
+                .foregroundColor(Color("TextColor"))
 
             content()
         }
         .padding()
         .background(color.opacity(0.9))
-        .cornerRadius(20)
+        .cornerRadius(16)
         .shadow(color: color.opacity(0.4), radius: 6, x: 0, y: 3)
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.hotPink.opacity(0.5), lineWidth: 1)
-        )
     }
 }
 
+#Preview {
+    SettingsView()
+        .environmentObject(TransactionsController.shared)
+        .environmentObject(AppSettings())
+}
