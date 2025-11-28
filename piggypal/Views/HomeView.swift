@@ -32,16 +32,10 @@ struct HomeView: View {
         }
         .filter { $0.amount > 0 }
         
-        ScrollView {
-            VStack {
-                // Title
-                Text("Home")
-                    .font(Font.largeTitle.bold())
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                
+        NavigationStack {
+            ScrollView {
                 HStack {
-                    // PiggyPal Logo
+                    // MARK: PiggyPal Logo
                     Button {
                         selectedTab = "feed"
                     } label: {
@@ -49,32 +43,40 @@ struct HomeView: View {
                             .resizable()
                             .scaledToFit()
                             .padding()
+                            .shadow(color: Color("AccentColor").opacity(0.15), radius: 12, y: 6)
                     }
                     
-                    // Balance Card
+                    // MARK: Balance Card
                     VStack {
+                        // Title
                         Text("Balance")
+                            .font(.subheadline)
                             .foregroundColor(Color("TextColor"))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
+                        // Current Balance
                         Text(currentBalance, format: .currency(code: "USD")) // change to update based on transaction database
-                            .font(Font.largeTitle.bold())
+                            .font(.system(size: 36, weight: .bold))
                             .foregroundColor(Color("TextColor"))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding([.top, .bottom], 5)
                         
+                        // Today's Date
                         Text("As of \(Date().formatted(.dateTime.month(.twoDigits).day(.twoDigits).year(.twoDigits)))")
+                            .font(.footnote)
                             .foregroundColor(Color("TextColor"))
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 15)
+                        RoundedRectangle(cornerRadius: 16)
                             .fill(Color("CardColor"))
+                            .shadow(color: Color("AccentColor").opacity(0.15), radius: 12, y: 6)
                     )
+                    .padding(.trailing)
                 }
                 
-                // Budget Warning
+                // MARK: Budget Warning
                 if controller.getBalance(from: controller.getAllTransactions()) < 0.0 {
                     HStack {
                         Spacer()
@@ -94,8 +96,9 @@ struct HomeView: View {
                     .padding(.top, -20)
                 }
                 
-                // Spending Analysis Card
+                // MARK: Spending Analysis Card
                 VStack {
+                    // Title
                     Text("Spending Analysis")
                         .font(Font.title2.bold())
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -154,23 +157,25 @@ struct HomeView: View {
                     Button("View Log") {
                         selectedTab = "log"
                     }
-                    .font(Font.title3.bold())
+                    .font(Font.headline)
                     .foregroundColor(Color("TextColor"))
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 15)
+                        RoundedRectangle(cornerRadius: 14)
                             .fill(Color("Button2Color"))
                     )
                 }
                 .padding()
                 .background(
-                    RoundedRectangle(cornerRadius: 15)
+                    RoundedRectangle(cornerRadius: 16)
                         .fill(Color("CardColor"))
+                        .shadow(color: Color("AccentColor").opacity(0.15), radius: 12, y: 6)
                 )
+                .padding([.leading, .trailing])
                 
                 Spacer()
             }
-            .padding([.leading, .trailing])
+            .navigationTitle("Home")
         }
     }
 }

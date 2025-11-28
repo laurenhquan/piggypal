@@ -14,15 +14,7 @@ struct RecordView: View {
         // Use controller to access Transaction information from TransactionView
         let transaction_data = controller.getAllTransactions()
         
-        // Title
-        VStack(alignment: .center) {
-            Text("Transaction History")
-                .font(Font.largeTitle.bold())
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-            
-            Divider()
-            
+        NavigationStack {
             ScrollView {
                 Grid() {
                     // Transaction History Labels
@@ -77,6 +69,7 @@ struct RecordView: View {
                 )
                 Spacer()
             }
+            .navigationTitle("Transaction Log")
             .padding()
         }
     }
