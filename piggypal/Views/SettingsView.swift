@@ -8,21 +8,13 @@
 import SwiftUI
 import Combine
 
-//class AppSettings: ObservableObject {
-//    @Published var selectedCurrency: String = "USD"
-//    @Published var budgetPeriod: String = "Monthly"
-//    @Published var notificationsEnabled: Bool = false
-//    @Published var notificationType: String = "Standard"
-//    @Published var spendingBudget: String = ""
-//}
-
 struct SettingsView: View {
     @EnvironmentObject var controller: TransactionsController
 
 //  UserDefault settings
-    @State private var currency: String = UserDefaults.standard.string(forKey: "defaultCurrency") ?? "USD"
-    @State private var budget: String = UserDefaults.standard.string(forKey: "defaultBudget") ?? ""
-    @State private var period: String = UserDefaults.standard.string(forKey: "budgetPeriod") ?? "Monthly"
+    @AppStorage("defaultCurrency") private var currency: String = "USD"
+    @AppStorage("defaultBudget") private var budget: Double = 0.0
+    @AppStorage("budgetPeriod") private var period: String = "Monthly"
     
     @State private var isCleared: Bool = false
 
@@ -53,10 +45,12 @@ struct SettingsView: View {
                                 Text(c)
                             }
                         }
-                        .onChange(of: currency) {
-                            UserDefaults.standard.set(currency, forKey: "defaultCurrency")
+                        .onChange(of: currency) { oldCurrency, newCurrency in
+                            Task {
+                                await controller.convertTransactions(from: oldCurrency, to: newCurrency)
+                            }
                         }
-//                        .pickerStyle(MenuPickerStyle())
+                        .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .center)
                         .tint(Color("TextColor"))
                         .background(
@@ -67,14 +61,7 @@ struct SettingsView: View {
 
                     // MARK: - Spending Budget
                     settingsCard(title: "Spending Budget", color: Color("CardColor")) {
-                        TextField("Enter budget amount", text: $budget)
-                            .onChange(of: budget) {
-                                if let value = Double(budget) {
-                                    UserDefaults.standard.set(value, forKey: "defaultBudget")
-                                } else {
-                                    UserDefaults.standard.removeObject(forKey: "defaultBudget")
-                                }
-                            }
+                        TextField("Enter budget amount", value: $budget, format: .number)
                             .keyboardType(.decimalPad)
                             .padding()
                             .background(
@@ -89,9 +76,6 @@ struct SettingsView: View {
                             ForEach(budgetPeriods, id: \.self) { p in
                                 Text(p)
                             }
-                        }
-                        .onChange(of: period) { oldValue, newValue in
-                            UserDefaults.standard.set(newValue, forKey: "budgetPeriod")
                         }
                         .pickerStyle(SegmentedPickerStyle())
                         .padding(.vertical, 6)

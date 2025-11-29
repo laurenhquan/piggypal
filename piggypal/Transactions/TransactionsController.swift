@@ -9,6 +9,8 @@ import Foundation
 import CoreData
 import Combine
 
+struct ExchangeRateResponse: Codable { let conversion_rates: [String: Double] }
+
 class TransactionsController: ObservableObject {
     static let shared = TransactionsController()
     
@@ -73,6 +75,39 @@ class TransactionsController: ObservableObject {
         
         save()
         updateDB()
+    }
+    
+    @MainActor
+    func convertTransactions(from oldCurrency: String, to newCurrency: String) async {
+        guard oldCurrency != newCurrency else { return }
+
+        let apiKey = "d7eac8b4713ba76806c910b7"
+        let urlString = "https://v6.exchangerate-api.com/v6/\(apiKey)/latest/\(oldCurrency)"
+        guard let url = URL(string: urlString) else { return }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let decoded = try JSONDecoder().decode(ExchangeRateResponse.self, from: data)
+
+            guard let conversionRate = decoded.conversion_rates[newCurrency] else {
+                print("No conversion rate found for \(newCurrency)")
+                return
+            }
+
+            for tx in transactions {
+                if let amount = tx.amount?.decimalValue {
+                    let converted = amount * Decimal(conversionRate)
+                    tx.amount = NSDecimalNumber(decimal: converted)
+                    tx.currencyUsed = newCurrency
+                }
+            }
+
+            save()
+            updateDB()
+
+        } catch {
+            print("Currency conversion failed: \(error.localizedDescription)")
+        }
     }
     
     func deleteTransaction(transaction: Transaction) {

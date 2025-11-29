@@ -14,6 +14,10 @@ struct HomeView: View {
     @EnvironmentObject var controller: TransactionsController
     @State private var categories: [String] = ["Home & Utilities", "Transportation", "Groceries", "Health", "Restaurant & Dining", "Shopping & Entertainment"]
     
+//  UserDefaults
+    @AppStorage("defaultCurrency") private var currency: String = "USD"
+    @AppStorage("defaultBudget") private var budget: Double = -1
+    
     var body: some View {
         let startDate = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date()))!
         let endDate = Calendar.current.date(byAdding: DateComponents(month: 1, day: -1), to: startDate)!
@@ -23,6 +27,12 @@ struct HomeView: View {
                 return date >= startDate && date <= endDate
             }
         let currentBalance = controller.getBalance(from: currentTransactions)
+        let withdrawals = currentTransactions
+            .filter { tx in
+                let amt = tx.amount?.decimalValue ?? 0
+                return amt < 0.0
+            }
+        let amountSpent = abs(controller.getBalance(from: withdrawals))
         let categoryData: [(category: String, amount: Decimal)] =
         categories.map { category in
             let tx = currentTransactions
@@ -55,7 +65,7 @@ struct HomeView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
                         // Current Balance
-                        Text(currentBalance, format: .currency(code: "USD")) // change to update based on transaction database
+                        Text(currentBalance, format: .currency(code: currency)) // change to update based on transaction database
                             .font(.system(size: 36, weight: .bold))
                             .foregroundColor(Color("TextColor"))
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -77,7 +87,7 @@ struct HomeView: View {
                 }
                 
                 // MARK: Budget Warning
-                if controller.getBalance(from: controller.getAllTransactions()) < 0.0 {
+                if budget > 0, amountSpent > Decimal(budget) {
                     HStack {
                         Spacer()
                         
