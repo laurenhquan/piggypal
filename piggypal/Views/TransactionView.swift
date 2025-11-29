@@ -9,20 +9,25 @@ import SwiftUI
 import Foundation
 
 struct TransactionView: View {
+    //Access data model functions
     @EnvironmentObject var controller: TransactionsController
     
-    //@Binding var Accounts: [String] //to get account data
-    @Binding var defaultCode: String
+    //Access user settings
+    @AppStorage("defaultCurrency") private var currency: String = "USD"
     
+    //Form data
     @State private var selectedDate = Date()
-    //@State private var selectedAccount: String = ""
-    @State private var transactionTitle: String = ""
     @State private var amount: Decimal?
-    @State private var currencyCode: String = ""
-    @State private var withdrawal: Bool = true
-    @State private var codes: [String] = Locale.commonISOCurrencyCodes
+    @State private var isWithdrawal: Bool = true
+    @State private var transactionDesc: String = ""
+    @State private var category: String = "Home & Utilities"
+    
+    //Form validation
     @State private var notValid: Bool = false
     @State private var isValid: Bool = false
+    
+    //Load data
+    @State private var codes: [String] = Locale.commonISOCurrencyCodes
     @State private var categories: [(name: String, icon: String)] = [
         ("Home & Utilities", "house.fill"),
         ("Transportation", "car.fill"),
@@ -31,23 +36,13 @@ struct TransactionView: View {
         ("Restaurant & Dining", "fork.knife"),
         ("Shopping & Entertainment", "bag.fill")
     ]
-
-    @State private var category: String = "Home & Utilities"
-    
-    init(defaultCode: Binding<String>) {
-        self._defaultCode = defaultCode
-        
-        // If defaultCode exists in codes, use it; else fallback to first code
-        let code = codes.contains(defaultCode.wrappedValue) ? defaultCode.wrappedValue : codes.first ?? ""
-            _currencyCode = State(initialValue: code)
-    }
-
     
     var body: some View {
         NavigationStack {
             VStack {
+                // MARK: Form
                 Form {
-//Date
+                    // MARK: Date
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Date")
                             .font(.headline)
@@ -71,12 +66,12 @@ struct TransactionView: View {
                             .fill(Color("CardColor"))
                     )
                     
-//Amount
+                    // MARK: Amount
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Amount")
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        TextField("Enter amount in \(currencyCode)", value: $amount, format: .currency(code: currencyCode))
+                        TextField("Enter amount in \(currency)", value: $amount, format: .currency(code: currency))
                             .keyboardType(.decimalPad)
                             .textFieldStyle(PlainTextFieldStyle())
                             .padding()
@@ -87,7 +82,7 @@ struct TransactionView: View {
                         
                         Divider()
                         
-                        Picker("Deposit or Withdrawal?", selection: $withdrawal) {
+                        Picker("Deposit or Withdrawal?", selection: $isWithdrawal) {
                             Text("Withdrawal")
                                 .tag(true)
                             Text("Deposit")
@@ -100,12 +95,12 @@ struct TransactionView: View {
                             .fill(Color("CardColor"))
                     )
                     
-//Description
+                    // MARK: Description
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Description")
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        TextField("Enter description", text: $transactionTitle)
+                        TextField("Enter description", text: $transactionDesc)
                             .padding()
                             .textFieldStyle(PlainTextFieldStyle())
                             .background(
@@ -119,7 +114,7 @@ struct TransactionView: View {
                             .fill(Color("CardColor"))
                     )
                     
-//Category
+                    // MARK: Category
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Category")
                             .font(.headline)
@@ -135,18 +130,17 @@ struct TransactionView: View {
                 .scrollContentBackground(.hidden)
                 .background(Color.white)
                 
-// Clear + Submit buttons
+                // MARK: Clear/Submit Buttons
                 HStack {
                     Spacer()
                     
                     Button("Clear", systemImage: "xmark") {
                         //reset form
                         selectedDate = Date()
-                        transactionTitle = ""
+                        transactionDesc = ""
                         category = "Home & Utilities"
                         amount = nil
-                        currencyCode = defaultCode
-                        withdrawal = true
+                        isWithdrawal = true
                     }
                     .bold()
                     .foregroundColor(Color.red)
@@ -162,18 +156,16 @@ struct TransactionView: View {
                         } else {
                             //send transaction info to database
                             var value: Decimal = amount ?? 0.0
-                            if withdrawal {
+                            if isWithdrawal {
                                 value = value * -1
                             }
-                            controller.feedPiggy(amount: value, currencyUsed: currencyCode, dateMade: selectedDate, category: category, desc: transactionTitle)
+                            controller.feedPiggy(amount: value, currencyUsed: currency, dateMade: selectedDate, category: category, desc: transactionDesc)
                             //reset form
                             selectedDate = Date()
-                            transactionTitle = ""
+                            transactionDesc = ""
                             category = "Home & Utilities"
                             amount = nil
-                            currencyCode = defaultCode
-                            withdrawal = true
-                            //notification on submit ""
+                            isWithdrawal = true
                             isValid = true
                         }
                     }
@@ -201,9 +193,6 @@ struct TransactionView: View {
 }
 
 #Preview {
-    //@Previewable @State var accs = ["A1", "A2", "A3"]
-    //@Previewable @EnvironmentObject var controller: TransactionsController
-    @Previewable @State var c = "USD"
-    TransactionView(defaultCode: $c)
+    TransactionView()
         .environmentObject(TransactionsController.shared)
 }
