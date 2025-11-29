@@ -11,7 +11,7 @@ import Combine
 struct SettingsView: View {
     @EnvironmentObject var controller: TransactionsController
 
-//  UserDefault settings
+//  AppStorage user settings
     @AppStorage("defaultCurrency") private var currency: String = "USD"
     @AppStorage("defaultBudget") private var budget: Double = 0.0
     @AppStorage("budgetPeriod") private var period: String = "Monthly"
@@ -21,7 +21,7 @@ struct SettingsView: View {
     // Full list of currencies (ISO common set)
     let currencies = Locale.commonISOCurrencyCodes.sorted()
 
-    let budgetPeriods = ["Daily", "Weekly", "Monthly"]
+    let budgetPeriods = ["Daily", "Weekly", "Monthly", "Yearly"]
 
     // Categories with system SF Symbols
     let categories: [(name: String, icon: String)] = [
@@ -47,7 +47,16 @@ struct SettingsView: View {
                         }
                         .onChange(of: currency) { oldCurrency, newCurrency in
                             Task {
-                                await controller.convertTransactions(from: oldCurrency, to: newCurrency)
+                                await controller.convertAllTransactions(from: oldCurrency, to: newCurrency)
+                                
+                                if budget > 0 {
+                                    do {
+                                        let newBudget = try await controller.convert(amount: Decimal(budget), from: oldCurrency, to: newCurrency)
+                                        budget = (newBudget as NSDecimalNumber).doubleValue
+                                    } catch {
+                                        print("Failed to convert budget: \(error)")
+                                    }
+                                }
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
@@ -61,7 +70,7 @@ struct SettingsView: View {
 
                     // MARK: - Spending Budget
                     settingsCard(title: "Spending Budget", color: Color("CardColor")) {
-                        TextField("Enter budget amount", value: $budget, format: .number)
+                        TextField(budget == 0 ? "Enter amount" : "", value: $budget, format: .number)
                             .keyboardType(.decimalPad)
                             .padding()
                             .background(
@@ -104,12 +113,12 @@ struct SettingsView: View {
                         .padding(.top, 6)
                     }
 
-                    // MARK: - Clear Data
+                    // MARK: - Clear Transactions
                     Button {
                         controller.clearAllTransactions()
                         isCleared = true
                     } label: {
-                        Text("Clear All Data")
+                        Text("Clear All Transactions")
                             .font(.headline)
                             .foregroundColor(Color("TextColor"))
                             .padding()
@@ -118,7 +127,7 @@ struct SettingsView: View {
                             .cornerRadius(14)
                             .shadow(color: Color("AccentColor").opacity(0.12), radius: 10, y: 5)
                     }
-                    .alert("Cleared!", isPresented: $isCleared) {
+                    .alert("Transactions cleared!", isPresented: $isCleared) {
                         Button("OK", role: .cancel) {}
                     }
                     .padding(.top, 8)
