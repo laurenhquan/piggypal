@@ -8,7 +8,7 @@
 import SwiftUI
 
 // API access key (may need to change if publish since free trial only allows 100 requests)
-private let EXCHANGE_HOST_API_KEY = "0fbeedb0e51d871fc005bfd77c89c06c"
+private let EXCHANGE_HOST_API_KEY = "36e939bf118305b5c9a3f1a7f42d741d"
 
 // Helpers for currency code list
 private let preferredCodes = ["USD","EUR","JPY","GBP","AUD","CAD","CNY","KRW","INR","MXN"]
