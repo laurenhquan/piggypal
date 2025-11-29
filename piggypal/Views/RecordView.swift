@@ -12,7 +12,7 @@ struct RecordView: View {
 
     var body: some View {
         // Use controller to access Transaction information from TransactionView
-        let transaction_data = controller.getAllTransactions()
+        let transaction_data = controller.transactions
         
         NavigationStack {
             ScrollView {
@@ -41,7 +41,6 @@ struct RecordView: View {
                     ForEach(transaction_data, id: \.self) { data in
                         let currencyCode = data.currencyUsed ?? ""
                         let amount = data.amount?.doubleValue ?? 0
-                        let positive = abs(amount)
                         let category = data.category ?? "N/A"
                         let dateMade = data.dateMade ?? Date()
                         let desc = data.desc ?? "N/A"
@@ -54,8 +53,11 @@ struct RecordView: View {
                                 .multilineTextAlignment(.center)
                             Text(desc)
                                 .multilineTextAlignment(.center)
-                            Text(positive, format: .currency(code: currencyCode))
+                            Text(amount, format: .currency(code: currencyCode))
                                 .multilineTextAlignment(.trailing)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                                .allowsTightening(true)
                         }
                         .foregroundColor(Color("TextColor"))
                         Divider()
