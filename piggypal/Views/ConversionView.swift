@@ -10,23 +10,6 @@ import SwiftUI
 // API access key (may need to change if publish since free trial only allows 100 requests)
 private let EXCHANGE_HOST_API_KEY = "0fbeedb0e51d871fc005bfd77c89c06c"
 
-// Color
-extension Color {
-    static let pigPinkPrimary  = Color(hex: 0xFFC9D4)
-    static let pigPinkAccent   = Color(hex: 0xFE9FB1)
-    static let pigRoseDeep     = Color(hex: 0xAD646E)
-    static let pigCoinYellow   = Color(hex: 0xFCDE7E)
-    static let pigGoldMuted    = Color(hex: 0xE6C985)
-
-    init(hex: UInt, alpha: Double = 1.0) {
-        self.init(.sRGB,
-                  red:   Double((hex >> 16) & 0xff) / 255,
-                  green: Double((hex >> 8)  & 0xff) / 255,
-                  blue:  Double((hex)       & 0xff) / 255,
-                  opacity: alpha)
-    }
-}
-
 // Helpers for currency code list
 private let preferredCodes = ["USD","EUR","JPY","GBP","AUD","CAD","CNY","KRW","INR","MXN"]
 
@@ -127,7 +110,7 @@ struct ConversionView: View {
                         .font(.system(size: 18, weight: .bold))
                         .foregroundStyle(.black)
                         .padding(12)
-                        .background(Color.pigPinkAccent)
+                        .background(Color("Button1Color"))
                         .clipShape(Circle())
                 }
             }
@@ -137,9 +120,9 @@ struct ConversionView: View {
                 .foregroundStyle(.black.opacity(0.6))
         }
         .padding(16)
-        .background(Color.pigPinkPrimary)
+        .background(Color("CardColor"))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: Color.pigRoseDeep.opacity(0.15), radius: 12, y: 6)
+        .shadow(color: Color("AccentColor").opacity(0.15), radius: 12, y: 6)
     }
 
     private var currencyRow: some View {
@@ -161,7 +144,7 @@ struct ConversionView: View {
                         Spacer()
                         if selection.wrappedValue == code {
                             Image(systemName: "checkmark")
-                                .foregroundColor(.pigPinkAccent)
+                                .foregroundColor(Color("Button1Color"))
                         }
                     }
                 }
@@ -177,7 +160,7 @@ struct ConversionView: View {
             }
             .padding(.horizontal, 14).padding(.vertical, 12)
             .background(Color.white)
-            .overlay(RoundedRectangle(cornerRadius: 999).stroke(Color.pigGoldMuted, lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 999).stroke(Color("NoteColor"), lineWidth: 1))
             .clipShape(Capsule())
         }
     }
@@ -194,7 +177,7 @@ struct ConversionView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(Color.pigGoldMuted)
+        .background(Color("NoteColor"))
         .clipShape(Capsule())
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -205,13 +188,13 @@ struct ConversionView: View {
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity, minHeight: 54)
                 .foregroundStyle(.black)
-                .background(Color.pigCoinYellow)
+                .background(Color("Button2Color"))
                 .clipShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
         .opacity(amountIsValid && !isLoading ? 1 : 0.5)
         .disabled(!amountIsValid || isLoading)
-        .shadow(color: Color.pigRoseDeep.opacity(0.12), radius: 10, y: 5)
+        .shadow(color: Color("AccentColor").opacity(0.12), radius: 10, y: 5)
     }
 
     private var resultCard: some View {
@@ -238,9 +221,9 @@ struct ConversionView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .background(Color.pigPinkPrimary)
+        .background(Color("CardColor"))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: Color.pigRoseDeep.opacity(0.15), radius: 12, y: 6)
+        .shadow(color: Color("AccentColor").opacity(0.15), radius: 12, y: 6)
     }
 
     private var recentList: some View {
@@ -251,7 +234,7 @@ struct ConversionView: View {
             ForEach(history.indices, id: \.self) { i in
                 HStack {
                     Rectangle()
-                        .fill(Color.pigPinkAccent)
+                        .fill(Color("Button1Color"))
                         .frame(width: 4)
                     Text(history[i])
                         .frame(maxWidth: .infinity, alignment: .leading)

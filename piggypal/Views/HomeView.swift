@@ -42,8 +42,8 @@ struct HomeView: View {
                         Image("AppLogo")
                             .resizable()
                             .scaledToFit()
+                            .shadow(color: Color("AccentColor").opacity(0.12), radius: 10, y: 5)
                             .padding()
-                            .shadow(color: Color("AccentColor").opacity(0.15), radius: 12, y: 6)
                     }
                     
                     // MARK: Balance Card
@@ -164,6 +164,7 @@ struct HomeView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 14)
                             .fill(Color("Button2Color"))
+                            .shadow(color: Color("AccentColor").opacity(0.12), radius: 10, y: 5)
                     )
                 }
                 .padding()

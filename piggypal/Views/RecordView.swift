@@ -66,6 +66,7 @@ struct RecordView: View {
                 .background(
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color("CardColor"))
+                        .shadow(color: Color("AccentColor").opacity(0.15), radius: 12, y: 6)
                 )
                 .padding()
                 Spacer()

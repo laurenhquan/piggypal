@@ -8,14 +8,6 @@
 import SwiftUI
 import Combine
 
-// MARK: - Custom Colors
-extension Color {
-    static let darkPink = Color(red: 255/255, green: 158/255, blue: 177/255)
-    static let hotPink = Color(red: 255/255, green: 117/255, blue: 143/255)
-    static let lightPink = Color(red: 255/255, green: 201/255, blue: 212/255)
-    static let darkYellow = Color(red: 255/255, green: 207/255, blue: 107/255)
-}
-
 class AppSettings: ObservableObject {
     @Published var selectedCurrency: String = "USD"
     @Published var budgetPeriod: String = "Monthly"
@@ -28,12 +20,13 @@ struct SettingsView: View {
     @EnvironmentObject var controller: TransactionsController
 
     @EnvironmentObject var settings: AppSettings
+    
+    @State private var isCleared: Bool = false
 
     // Full list of currencies (ISO common set)
     let currencies = Locale.commonISOCurrencyCodes.sorted()
 
     let budgetPeriods = ["Daily", "Weekly", "Monthly"]
-    let notificationOptions = ["Standard", "Custom"]
 
     // Categories with system SF Symbols
     let categories: [(name: String, icon: String)] = [
@@ -51,7 +44,7 @@ struct SettingsView: View {
                 VStack(spacing: 24) {
 
                     // MARK: - Currency Card
-                    settingsCard(title: "Default Currency", color: .lightPink) {
+                    settingsCard(title: "Default Currency", color: Color("CardColor")) {
                         Picker("Currency", selection: $settings.selectedCurrency) {
                             ForEach(currencies, id: \.self) { currency in
                                 Text(currency)
@@ -61,7 +54,7 @@ struct SettingsView: View {
                     }
 
                     // MARK: - Spending Budget
-                    settingsCard(title: "Spending Budget", color: .lightPink) {
+                    settingsCard(title: "Spending Budget", color: Color("CardColor")) {
                         TextField("Enter budget amount", text: .constant(""))
                             .keyboardType(.decimalPad)
                             .padding()
@@ -70,7 +63,7 @@ struct SettingsView: View {
                     }
 
                     // MARK: - Budget Period
-                    settingsCard(title: "Budget Period", color: .lightPink) {
+                    settingsCard(title: "Budget Period", color: Color("CardColor")) {
                         Picker("Period", selection: $settings.budgetPeriod) {
                             ForEach(budgetPeriods, id: \.self) { period in
                                 Text(period)
@@ -81,13 +74,13 @@ struct SettingsView: View {
                     }
 
                     // MARK: - Default Categories (Icon Grid)
-                    settingsCard(title: "Default Categories", color: .lightPink) {
+                    settingsCard(title: "Default Categories", color: Color("CardColor")) {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 20) {
                             ForEach(categories, id: \.name) { category in
                                 VStack(spacing: 10) {
                                     Image(systemName: category.icon)
                                         .font(.system(size: 32))
-                                        .foregroundColor(.hotPink)
+                                        .foregroundColor(Color("AccentColor"))
 
                                     Text(category.name)
                                         .font(.subheadline)
@@ -105,7 +98,8 @@ struct SettingsView: View {
 
                     // MARK: - Clear Data
                     Button {
-                        // Clear data logic
+                        controller.clearAllTransactions()
+                        isCleared = true
                     } label: {
                         Text("Clear All Data")
                             .font(.headline)
@@ -114,7 +108,10 @@ struct SettingsView: View {
                             .frame(maxWidth: .infinity)
                             .background(Color("Button2Color"))
                             .cornerRadius(14)
-                            .shadow(color: Color.hotPink.opacity(0.4), radius: 5)
+                            .shadow(color: Color("AccentColor").opacity(0.12), radius: 10, y: 5)
+                    }
+                    .alert("Cleared!", isPresented: $isCleared) {
+                        Button("OK", role: .cancel) {}
                     }
                     .padding(.top, 8)
                 }
@@ -137,7 +134,7 @@ struct SettingsView: View {
         .padding()
         .background(color.opacity(0.9))
         .cornerRadius(16)
-        .shadow(color: color.opacity(0.4), radius: 6, x: 0, y: 3)
+        .shadow(color: Color("AccentColor").opacity(0.15), radius: 12, y: 6)
     }
 }
 
