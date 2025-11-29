@@ -8,6 +8,54 @@
 import SwiftUI
 import Charts
 
+extension TransactionsController {
+    func transactions(for period: String) -> [Transaction] {
+        let all = transactions
+
+        switch period {
+        case "Daily":
+            return all.filter { Calendar.current.isDateInToday($0.dateMade ?? Date()) }
+
+        case "Weekly":
+            return all.filter {
+                guard let date = $0.dateMade else { return false }
+                return Calendar.current.isDate(date, equalTo: Date(), toGranularity: .weekOfYear)
+            }
+
+        case "Monthly":
+            return all.filter {
+                guard let date = $0.dateMade else { return false }
+                return Calendar.current.isDate(date, equalTo: Date(), toGranularity: .month)
+            }
+
+        case "Yearly":
+            return all.filter {
+                guard let date = $0.dateMade else { return false }
+                return Calendar.current.isDate(date, equalTo: Date(), toGranularity: .year)
+            }
+
+        default:
+            return all
+        }
+    }
+
+    func totalEarned(for period: String) -> Decimal {
+        transactions(for: period)
+            .filter { ($0.amount as? Decimal ?? 0) > 0 }
+            .reduce(0) { $0 + ($1.amount as? Decimal ?? 0) }
+    }
+
+    func totalSpent(for period: String) -> Decimal {
+        transactions(for: period)
+            .filter { ($0.amount as? Decimal ?? 0) < 0 }
+            .reduce(0) { $0 + ($1.amount as? Decimal ?? 0) }
+    }
+
+    func currentBalance(for period: String) -> Decimal {
+        totalEarned(for: period) + totalSpent(for: period)
+    }
+}
+
 struct HomeView: View {
     @Binding var selectedTab: String
     @State private var showsWarningAlert = false
@@ -17,31 +65,9 @@ struct HomeView: View {
 //  UserDefaults
     @AppStorage("defaultCurrency") private var currency: String = "USD"
     @AppStorage("defaultBudget") private var budget: Double = -1
+    @AppStorage("budgetPeriod") private var period: String = "Monthly"
     
     var body: some View {
-        let startDate = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date()))!
-        let endDate = Calendar.current.date(byAdding: DateComponents(month: 1, day: -1), to: startDate)!
-        let currentTransactions = controller.transactions
-            .filter { tx in
-                guard let date = tx.dateMade else { return false }
-                return date >= startDate && date <= endDate
-            }
-        let currentBalance = controller.getBalance(from: currentTransactions)
-        let withdrawals = currentTransactions
-            .filter { tx in
-                let amt = tx.amount?.decimalValue ?? 0
-                return amt < 0.0
-            }
-        let amountSpent = abs(controller.getBalance(from: withdrawals))
-        let categoryData: [(category: String, amount: Decimal)] =
-        categories.map { category in
-            let tx = currentTransactions
-                .filter { $0.category == category }
-            let amount = controller.getBalance(from: tx)
-            return (category, amount)
-        }
-        .filter { $0.amount > 0 }
-        
         NavigationStack {
             ScrollView {
                 HStack {
@@ -65,9 +91,12 @@ struct HomeView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
                         // Current Balance
-                        Text(currentBalance, format: .currency(code: currency)) // change to update based on transaction database
+                        Text(controller.currentBalance(for: period), format: .currency(code: currency))
                             .font(.system(size: 36, weight: .bold))
                             .foregroundColor(Color("TextColor"))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                            .allowsTightening(true)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding([.top, .bottom], 5)
                         
@@ -87,7 +116,7 @@ struct HomeView: View {
                 }
                 
                 // MARK: Budget Warning
-                if budget > 0, amountSpent > Decimal(budget) {
+                if budget > 0, abs(controller.totalSpent(for: period)) > Decimal(budget) {
                     HStack {
                         Spacer()
                         
@@ -114,7 +143,16 @@ struct HomeView: View {
                         .font(Font.title2.bold())
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    // Category Pie Chart TODO: does not update, fix
+                    // Category Pie Chart
+                    let categoryData: [(category: String, amount: Decimal)] =
+                    categories.map { category in
+                        let tx = controller.transactions(for: period)
+                            .filter { $0.category == category }
+                        let amount = abs(controller.getBalance(from: tx))
+                        return (category, amount)
+                    }
+                    .filter { $0.amount > 0 }
+                    
                     if !categoryData.isEmpty {
                         let totalAmount = categoryData.reduce(0) { $0 + $1.amount }
                         
@@ -144,25 +182,23 @@ struct HomeView: View {
                             .foregroundColor(.gray)
                             .padding()
                     }
-                    
+//                    
                     // Spent vs Earned Graph
-                    let spent = currentTransactions.filter { ($0.amount?.decimalValue ?? 0) < 0 }
-                    let earned = currentTransactions.filter { ($0.amount?.decimalValue ?? 0) > 0 }
-                    let spentTotal = abs(controller.getBalance(from: spent))
-                    let earnedTotal = controller.getBalance(from: earned)
                     let spendEarnData: [(type: String, amount: Decimal)] = [
-                        ("Spent", spentTotal),
-                        ("Earned", earnedTotal)
+                        ("Spent", controller.totalSpent(for: period)),
+                        ("Earned", controller.totalEarned(for: period))
                     ]
                     
-                    Chart(spendEarnData, id: \.type) { item in
-                        BarMark(
-                            x: .value("Amount", item.amount)
-                        )
-                        .foregroundStyle(by: .value("Type", item.type))
+                    if !spendEarnData.isEmpty {
+                        Chart(spendEarnData, id: \.type) { item in
+                            BarMark(
+                                x: .value("Amount", item.amount)
+                            )
+                            .foregroundStyle(by: .value("Type", item.type))
+                        }
+                        .frame(height: 50, alignment: .center)
+                        .padding()
                     }
-                    .frame(height: 50, alignment: .center)
-                    .padding()
                     
                     // View Log Button
                     Button("View Log") {
