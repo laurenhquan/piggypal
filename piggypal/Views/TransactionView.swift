@@ -23,7 +23,15 @@ struct TransactionView: View {
     @State private var codes: [String] = Locale.commonISOCurrencyCodes
     @State private var notValid: Bool = false
     @State private var isValid: Bool = false
-    @State private var categories: [String] = ["Home & Utilities", "Transportation", "Groceries", "Health", "Restaurant & Dining", "Shopping & Entertainment"]
+    @State private var categories: [(name: String, icon: String)] = [
+        ("Home & Utilities", "house.fill"),
+        ("Transportation", "car.fill"),
+        ("Groceries", "cart.fill"),
+        ("Health", "heart.fill"),
+        ("Restaurant & Dining", "fork.knife"),
+        ("Shopping & Entertainment", "bag.fill")
+    ]
+
     @State private var category: String = "Home & Utilities"
     
     init(defaultCode: Binding<String>) {
@@ -39,7 +47,7 @@ struct TransactionView: View {
         NavigationStack {
             VStack {
                 Form {
-                    //Date
+//Date
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Date")
                             .font(.headline)
@@ -63,28 +71,19 @@ struct TransactionView: View {
                             .fill(Color("CardColor"))
                     )
                     
-                    //Amount TODO: take out currency option
+//Amount
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Amount")
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        HStack {
-                            TextField("Enter amount in ...", value: $amount, format: .currency(code: currencyCode))
-                                .keyboardType(.decimalPad)
-                                .textFieldStyle(PlainTextFieldStyle())
-                                .id(currencyCode)
-                            Picker("", selection: $currencyCode) {
-                                ForEach (codes, id: \.self) {c in
-                                    Text(c)
-                                        .tag(c)
-                                }
-                            }
-                        }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 14)
-                                .fill(Color("Button1Color"))
-                        )
+                        TextField("Enter amount in \(currencyCode)", value: $amount, format: .currency(code: currencyCode))
+                            .keyboardType(.decimalPad)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .fill(Color("Button1Color"))
+                            )
                         
                         Divider()
                         
@@ -101,7 +100,7 @@ struct TransactionView: View {
                             .fill(Color("CardColor"))
                     )
                     
-                    //Description TODO: make description box bigger
+//Description
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Description")
                             .font(.headline)
@@ -120,22 +119,12 @@ struct TransactionView: View {
                             .fill(Color("CardColor"))
                     )
                     
-                    //Category
+//Category
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Category")
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        Picker("Add to...", selection: $category) {
-                            ForEach (categories, id: \.self) {c in
-                                Text(c)
-                                    .tag(c)
-                            }
-                        }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 14)
-                                .fill(Color("Button1Color"))
-                        )
+                        CategoryGridView(categories: $categories, selectedCategory: $category)
                     }
                     .padding()
                     .background(
@@ -146,6 +135,7 @@ struct TransactionView: View {
                 .scrollContentBackground(.hidden)
                 .background(Color.white)
                 
+// Clear + Submit buttons
                 HStack {
                     Spacer()
                     
@@ -179,7 +169,7 @@ struct TransactionView: View {
                             //reset form
                             selectedDate = Date()
                             transactionTitle = ""
-                            category = ""
+                            category = "Home & Utilities"
                             amount = nil
                             currencyCode = defaultCode
                             withdrawal = true
