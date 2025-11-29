@@ -49,17 +49,6 @@ class TransactionsController: ObservableObject {
         }
     }
     
-    func getAllTransactions() -> [Transaction] {
-        let fetchRequest: NSFetchRequest<Transaction> = Transaction.fetchRequest()
-        
-        do {
-            return try persistentContainer.viewContext.fetch(fetchRequest)
-        } catch {
-            print("Failed to return transactions: \(error.localizedDescription)")
-            return []
-        }
-    }
-    
     func getBalance(from transactions: [Transaction]) -> Decimal {
         return transactions.reduce(0) { $0 + ($1.amount?.decimalValue ?? 0)}
     }
