@@ -9,14 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selectedTab = "home"
-    @State var c = "USD"   
 
     @EnvironmentObject var transactionsController: TransactionsController
 
     var body: some View {
         TabView(selection: $selectedTab) {
             
-            TransactionView(defaultCode: $c)
+            TransactionView()
                 .tabItem {
                     Image(systemName: "carrot")
                     Text("Feed")
