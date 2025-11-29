@@ -11,7 +11,6 @@ struct ContentView: View {
     @State var selectedTab = "home"
     @State var c = "USD"   
 
-    @EnvironmentObject var settings: AppSettings
     @EnvironmentObject var transactionsController: TransactionsController
 
     var body: some View {
@@ -52,13 +51,11 @@ struct ContentView: View {
                 }
                 .tag("settings")
         }
-        .environmentObject(settings)
         .environmentObject(transactionsController)
     }
 }
 
 #Preview {
     ContentView()
-        .environmentObject(AppSettings())
         .environmentObject(TransactionsController.shared)
 }

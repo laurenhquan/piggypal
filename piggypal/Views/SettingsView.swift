@@ -8,18 +8,21 @@
 import SwiftUI
 import Combine
 
-class AppSettings: ObservableObject {
-    @Published var selectedCurrency: String = "USD"
-    @Published var budgetPeriod: String = "Monthly"
-    @Published var notificationsEnabled: Bool = false
-    @Published var notificationType: String = "Standard"
-    @Published var spendingBudget: String = ""
-}
+//class AppSettings: ObservableObject {
+//    @Published var selectedCurrency: String = "USD"
+//    @Published var budgetPeriod: String = "Monthly"
+//    @Published var notificationsEnabled: Bool = false
+//    @Published var notificationType: String = "Standard"
+//    @Published var spendingBudget: String = ""
+//}
 
 struct SettingsView: View {
     @EnvironmentObject var controller: TransactionsController
 
-    @EnvironmentObject var settings: AppSettings
+//  UserDefault settings
+    @State private var currency: String = UserDefaults.standard.string(forKey: "defaultCurrency") ?? "USD"
+    @State private var budget: String = UserDefaults.standard.string(forKey: "defaultBudget") ?? ""
+    @State private var period: String = UserDefaults.standard.string(forKey: "budgetPeriod") ?? "Monthly"
     
     @State private var isCleared: Bool = false
 
@@ -45,29 +48,50 @@ struct SettingsView: View {
 
                     // MARK: - Currency Card
                     settingsCard(title: "Default Currency", color: Color("CardColor")) {
-                        Picker("Currency", selection: $settings.selectedCurrency) {
-                            ForEach(currencies, id: \.self) { currency in
-                                Text(currency)
+                        Picker("Currency", selection: $currency) {
+                            ForEach(currencies, id: \.self) { c in
+                                Text(c)
                             }
                         }
-                        .pickerStyle(MenuPickerStyle())
+                        .onChange(of: currency) {
+                            UserDefaults.standard.set(currency, forKey: "defaultCurrency")
+                        }
+//                        .pickerStyle(MenuPickerStyle())
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .tint(Color("TextColor"))
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(Color("Button1Color"))
+                        )
                     }
 
                     // MARK: - Spending Budget
                     settingsCard(title: "Spending Budget", color: Color("CardColor")) {
-                        TextField("Enter budget amount", text: .constant(""))
+                        TextField("Enter budget amount", text: $budget)
+                            .onChange(of: budget) {
+                                if let value = Double(budget) {
+                                    UserDefaults.standard.set(value, forKey: "defaultBudget")
+                                } else {
+                                    UserDefaults.standard.removeObject(forKey: "defaultBudget")
+                                }
+                            }
                             .keyboardType(.decimalPad)
                             .padding()
-                            .background(Color.white.opacity(0.8))
-                            .cornerRadius(14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .fill(Color("Button1Color"))
+                            )
                     }
 
                     // MARK: - Budget Period
                     settingsCard(title: "Budget Period", color: Color("CardColor")) {
-                        Picker("Period", selection: $settings.budgetPeriod) {
-                            ForEach(budgetPeriods, id: \.self) { period in
-                                Text(period)
+                        Picker("Period", selection: $period) {
+                            ForEach(budgetPeriods, id: \.self) { p in
+                                Text(p)
                             }
+                        }
+                        .onChange(of: period) { oldValue, newValue in
+                            UserDefaults.standard.set(newValue, forKey: "budgetPeriod")
                         }
                         .pickerStyle(SegmentedPickerStyle())
                         .padding(.vertical, 6)
@@ -141,5 +165,4 @@ struct SettingsView: View {
 #Preview {
     SettingsView()
         .environmentObject(TransactionsController.shared)
-        .environmentObject(AppSettings())
 }
