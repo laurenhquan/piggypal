@@ -17,17 +17,18 @@ struct TransactionView: View {
     
     //Form data
     @State private var selectedDate = Date()
-    @State private var amount: Decimal?
+    @State private var amountText: String = ""
+    @State private var amount: Decimal = 0.0
     @State private var isWithdrawal: Bool = true
     @State private var transactionDesc: String = ""
     @State private var category: String = "Home & Utilities"
+    @FocusState private var amountFieldFocused: Bool
     
     //Form validation
     @State private var notValid: Bool = false
     @State private var isValid: Bool = false
     
     //Load data
-    @State private var codes: [String] = Locale.commonISOCurrencyCodes
     @State private var categories: [(name: String, icon: String)] = [
         ("Home & Utilities", "house.fill"),
         ("Transportation", "car.fill"),
@@ -36,6 +37,41 @@ struct TransactionView: View {
         ("Restaurant & Dining", "fork.knife"),
         ("Shopping & Entertainment", "bag.fill")
     ]
+    
+    
+    func formatAmount(_ value: String) {
+        var result = ""
+        var decimalFound = false
+
+        for char in value {
+            if char.isNumber {
+                result.append(char)
+            } else if char == "." && !decimalFound {
+                result.append(char)
+                decimalFound = true
+            }
+        }
+
+        // If empty, reset
+        guard !result.isEmpty else {
+            amountText = ""
+            return
+        }
+        
+        let number = Double(result) ?? 0
+            
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currency   // ← USE CURRENCY CODE HERE
+        formatter.maximumFractionDigits = 2
+        formatter.minimumFractionDigits = 2
+
+        if let formatted = formatter.string(from: NSNumber(value: number)) {
+            amountText = formatted
+        }
+        
+    }
+
     
     var body: some View {
         NavigationStack {
@@ -71,9 +107,15 @@ struct TransactionView: View {
                         Text("Amount")
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        TextField("Enter amount in \(currency)", value: $amount, format: .currency(code: currency))
+                        TextField("Enter amount in \(currency)", text: $amountText)
                             .keyboardType(.decimalPad)
                             .textFieldStyle(PlainTextFieldStyle())
+                            .focused($amountFieldFocused)
+                            .onChange(of: amountFieldFocused) { oldValue, newValue in
+                                if !newValue {
+                                    formatAmount(amountText)
+                                }
+                            }
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 14)
@@ -139,7 +181,7 @@ struct TransactionView: View {
                         selectedDate = Date()
                         transactionDesc = ""
                         category = "Home & Utilities"
-                        amount = nil
+                        amountText = ""
                         isWithdrawal = true
                     }
                     .bold()
@@ -151,20 +193,21 @@ struct TransactionView: View {
                     )
                     
                     Button("Submit", systemImage: "plus"){
-                        if amount == nil {
+                        if amountText == "" {
                             notValid = true
                         } else {
                             //send transaction info to database
-                            var value: Decimal = amount ?? 0.0
+                            let value = amountText.filter { "0123456789.".contains($0) }
+                            amount = Decimal(string: value) ?? 0.0
                             if isWithdrawal {
-                                value = value * -1
+                                amount = amount * -1
                             }
-                            controller.feedPiggy(amount: value, currencyUsed: currency, dateMade: selectedDate, category: category, desc: transactionDesc)
+                            controller.feedPiggy(amount: amount, currencyUsed: currency, dateMade: selectedDate, category: category, desc: transactionDesc)
                             //reset form
                             selectedDate = Date()
                             transactionDesc = ""
                             category = "Home & Utilities"
-                            amount = nil
+                            amountText = ""
                             isWithdrawal = true
                             isValid = true
                         }
